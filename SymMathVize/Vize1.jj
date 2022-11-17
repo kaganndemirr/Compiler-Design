@@ -1,0 +1,61 @@
+options {
+    STATIC = true; // make parser methods static
+    DEBUG_PARSER = true;
+    LOOKAHEAD = 1;
+}
+
+PARSER_BEGIN(VizeParser)
+public class VizeParser {
+  public static void main(String[] args) throws ParseException {
+    new VizeParser(System.in).parse();
+  }
+}
+PARSER_END(VizeParser)
+
+/*
+E -> E2 E3
+E2 -> (E)
+E2 -> x
+E2 -> RNUM
+Op -> ^
+Op -> *
+Op -> /
+E3 -> (Op E2 E3)?
+*/
+
+SKIP : { " " | "\n" | "\t" | "\r" }
+
+TOKEN : /* OPERATORS */
+{
+   < TIMES: "*" >
+   | < DIVIDE: "/" >
+   | < POWER: "^" >
+   | < LRP: "(" >
+   | < RRP: ")" >
+   | < RNUM: (["0"-"9"])+ | (["0"-"9"])+ "/" (["0"-"9"])+ >
+}
+
+void parse() : {}
+{
+    E() <EOF>
+}
+
+void E() : {}
+{
+    E2() E3()
+}
+
+void E2() : {}
+{
+    <LRP> E() <RRP> | "x" | <RNUM>
+}
+
+void Op() : {}
+{
+    <TIMES> | <DIVIDE> | <POWER>
+}
+
+void E3() : {}
+{
+    (Op() E2() E3())?
+}
