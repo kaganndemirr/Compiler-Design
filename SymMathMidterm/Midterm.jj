@@ -1,0 +1,123 @@
+options {
+    STATIC = true; // make parser methods static
+    DEBUG_PARSER = true;
+    LOOKAHEAD = 1;
+}
+
+PARSER_BEGIN(MidtermParser)
+public class MidtermParser {
+  public static void main(String[] args) throws ParseException {
+    Exp e = new MidtermParser(System.in).parse();
+    System.out.println(e + "");
+  }
+}
+PARSER_END(MidtermParser)
+
+/*
+E -> E2 E3
+E2 -> (E)
+E2 -> ID
+E2 -> RNUM
+Op -> ^
+Op -> *
+Op -> /
+E3 -> (<TIMES> E2 E3)?
+E3 -> (<DIVIDE> E2 E3)?
+E3 -> (<POWER> E2 E3)?
+*/
+
+SKIP : { " " | "\n" | "\t" | "\r" }
+
+TOKEN : /* OPERATORS */
+{
+   < TIMES: "*" >
+   | < DIVIDE: "/" >
+   | < POWER: "^" >
+   | < LRP: "(" >
+   | < RRP: ")" >
+   | < ID: "x" >
+   | < RNUM: (["0"-"9"])+ | (["0"-"9"])+ "/" (["0"-"9"])+ >
+}
+
+// İlk versiyon
+
+/*
+void parse() : {}
+{
+    E() <EOF>
+}
+
+void E() : {}
+{
+    E2() E3()
+}
+
+void E2() : {}
+{
+    <LRP> E() <RRP> | <ID> | <RNUM>
+}
+
+void E3() : {}
+{
+    (<TIMES> E2() E3() | <DIVIDE> E2() E3() | <POWER> E2() E3())?
+}
+*/
+
+// Ağaç oluşturma, işlem önceliği yok
+
+/*
+Exp parse() : {Exp e;}
+{
+    e = E() <EOF> {return e;}
+}
+
+Exp E() : {Exp e1;}
+{
+    e1 = E2() e1 = E3(e1) {return e1;}
+}
+
+Exp E2() : {Exp e1; Token t;}
+{
+    <LRP> e1 = E() <RRP> {return e1;} 
+    | t = <ID> {return new X(t.image);}
+    | t = <RNUM> {return new RNum(t.image);}
+}
+
+Exp E3(Exp e1) : {Exp e2;}
+{
+    (<POWER> e2 = E2()  e2 = E3(e2) {e1 = new  Power(e1,e2);}
+    |<TIMES> e2 = E2()  e2 = E3(e2) {e1 = new  Times(e1,e2);}
+    |<DIVIDE> e2 = E2()  e2 = E3(e2) {e1 = new  Divide(e1,e2);})? {return e1;}
+}
+*/
+
+// Ağaç oluşumu, işlem Önceliği
+
+Exp parse() : {Exp e;}
+{
+    e = E() <EOF> {return e;}
+}
+
+Exp E() : {Exp e1;}
+{
+    e1 = P() e1 = E3(e1) {return e1;}
+}
+
+Exp E2() : {Exp e1; Token t;}
+{
+    <LRP> e1 = E() <RRP> {return e1;} 
+    | t = <ID> {return new X(t.image);}
+    | t = <RNUM> {return new RNum(t.image);}
+}
+
+Exp P(): {Exp e1, e2;}
+{
+    e1 = E2() (<POWER> e2 = P() {e1 = new Power(e1, e2);})? {return e1;}
+}
+
+Exp E3(Exp e1) : {Exp e2;}
+{
+    (<TIMES> e2 = P()  e2 = E3(e2) {e1 = new  Times(e1,e2);}
+    |<DIVIDE> e2 = P()  e2 = E3(e2) {e1 = new  Divide(e1,e2);}
+    | <LRP> e1 = E() <RRP>)? {return e1;}
+}
