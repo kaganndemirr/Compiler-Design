@@ -9,6 +9,8 @@ public class MidtermParser {
   public static void main(String[] args) throws ParseException {
     Exp e = new MidtermParser(System.in).parse();
     System.out.println(e + "");
+    MidtermVisitor v = new MidtermVisitor();
+    v.visit(e);
   }
 }
 PARSER_END(MidtermParser)

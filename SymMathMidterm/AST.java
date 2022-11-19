@@ -1,17 +1,21 @@
 abstract class Exp{
-	public abstract void accept(Visitor v);
+	public abstract Object accept(Visitor v);
 }
 
 class RNum extends Exp{
-	int numerator;
-	int denominator;
+	public int numerator;
+	public int denominator;
 	public RNum(String number){
-		if(number.length() != 1){
+		if(number.length() > 1){
 			numerator = Integer.parseInt(String.valueOf(number.charAt(0)));
 			denominator = Integer.parseInt(String.valueOf(number.charAt(2)));
 		}
+		else if (number.length() == 1){
+			numerator = Integer.parseInt(String.valueOf(number.charAt(0)));
+			denominator = 1;
+		}
 		else{
-			numerator =Integer.parseInt(String.valueOf(number.charAt(0)));
+			numerator = 1;
 			denominator = 1;
 		}
 	}
@@ -23,22 +27,22 @@ class RNum extends Exp{
 			return "RNum("+ numerator + "/" + denominator +")";
 		}
 	}
-	public void accept(Visitor v){
-		v.visit(this);
+	public Object accept(Visitor v){
+		return v.visit(this);
 	}
 }
 
 
 class X extends Exp{
-	String id;
+	public String id;
 	public X(String id){
 		this.id = id;
 	}
 	public String toString(){
 		return "X(" + id + ")";
 	}
-	public void accept(Visitor v){
-		v.visit(this);
+	public Object accept(Visitor v){
+		return v.visit(this);
 	}
 }
 
@@ -52,8 +56,8 @@ class Times extends Exp{
 	public String toString(){
 		return "Times(" + e1 + "," + e2 +")";
 	}
-	public void accept(Visitor v){
-		v.visit(this);
+	public Object accept(Visitor v){
+		return v.visit(this);
 	}
 }
 
@@ -66,8 +70,8 @@ class Divide extends Exp{
 	public String toString(){
 		return "Divide(" + e1 + "," + e2 +")";
 	}
-	public void accept(Visitor v){
-		v.visit(this);
+	public Object accept(Visitor v){
+		return v.visit(this);
 	}
 }
 
@@ -80,7 +84,7 @@ class Power extends Exp{
 	public String toString(){
 		return "Power(" + e1 + "," + e2 +")";
 	}
-	public void accept(Visitor v){
-		v.visit(this);
+	public Object accept(Visitor v){
+		return v.visit(this);
 	}
 }
