@@ -7,11 +7,11 @@ class RNum extends Exp{
 	public int denominator;
 	public RNum(String number){
 		if(number.length() > 1){
-			numerator = Integer.parseInt(String.valueOf(number.charAt(0)));
-			denominator = Integer.parseInt(String.valueOf(number.charAt(2)));
+			numerator = Integer.parseInt(number.split("/")[0]);
+			denominator = Integer.parseInt(number.split("/")[1]);
 		}
 		else if(number.length() == 1) {
-			numerator = Integer.parseInt(String.valueOf(number.charAt(0)));
+			numerator = Integer.parseInt(number.split("/")[0]);
 			denominator = 1;
 		}
 		else{

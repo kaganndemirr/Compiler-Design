@@ -13,7 +13,7 @@ public class MidtermParser {
     Exp e = new MidtermParser(System.in).parse();
     System.out.println(e + "");
     MidtermVisitor v = new MidtermVisitor();
-    v.visit(e);
+    System.out.println(v.visit(e) + "");
   }
 }
 PARSER_END(MidtermParser)
@@ -37,36 +37,13 @@ TOKEN : /* OPERATORS */
    | < RNUM: (["0"-"9"])+ | (["0"-"9"])+ "/" (["0"-"9"])+ >
 }
 
-/*
-// Only Parser, No AST
-void parse() : {}
-{
-    E() <EOF>
-}
-
-void E() : {}
-{
-    P() (<TIMES> P() | <DIVIDE> P())*
-}
-
-void F() : {}
-{
-    <LRP> E() <RRP> | <ID> | <RNUM>
-}
-
-void P() : {}
-{
-   F() (<POWER> P())?
-}
-*/
-
 // AST
 Exp parse(): {Exp e;}
 {
    e = E() <EOF> {return e;} 
 } 
 
-
+// E -> P (("*" | "/") P)?
 Exp E(): {Exp e1,e2;}
 {  
     e1=P()
@@ -79,9 +56,10 @@ Exp E(): {Exp e1,e2;}
     {return e1;}
 }
 
+// P -> E2 ("^" P)?
 Exp P(): {Exp e1,e2;}
 {  
-    e1=F()
+    e1=E2()
     [
      <POWER> e2 =P() { e1 = new Power(e1,e2);}
     ]
@@ -89,7 +67,11 @@ Exp P(): {Exp e1,e2;}
     {return e1;}
 }
 
-Exp F(): {Exp e1; Token t;}
+/*
+E2 -> id
+E2 -> num
+*/
+Exp E2(): {Exp e1; Token t;}
 {
     <LRP> e1 = E() <RRP> {return e1;}
     |t = <ID> {return new X(t.image);}
