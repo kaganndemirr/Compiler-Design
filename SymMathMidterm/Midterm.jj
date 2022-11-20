@@ -7,6 +7,9 @@ options {
 PARSER_BEGIN(MidtermParser)
 public class MidtermParser {
   public static void main(String[] args) throws ParseException {
+    /*
+    new MidtermParser(System.in).parse();
+    */
     Exp e = new MidtermParser(System.in).parse();
     System.out.println(e + "");
     MidtermVisitor v = new MidtermVisitor();
@@ -16,16 +19,9 @@ public class MidtermParser {
 PARSER_END(MidtermParser)
 
 /*
-E -> E2 E3
-E2 -> (E)
-E2 -> ID
-E2 -> RNUM
-Op -> ^
-Op -> *
-Op -> /
-E3 -> (<TIMES> E2 E3)?
-E3 -> (<DIVIDE> E2 E3)?
-E3 -> (<POWER> E2 E3)?
+E -> P (* P | / P)*
+P -> F (^ P)?
+F -> (E) | ID | RNUM
 */
 
 SKIP : { " " | "\n" | "\t" | "\r" }
@@ -41,9 +37,8 @@ TOKEN : /* OPERATORS */
    | < RNUM: (["0"-"9"])+ | (["0"-"9"])+ "/" (["0"-"9"])+ >
 }
 
-// İlk versiyon
-
 /*
+// Only Parser, No AST
 void parse() : {}
 {
     E() <EOF>
@@ -51,75 +46,52 @@ void parse() : {}
 
 void E() : {}
 {
-    E2() E3()
+    P() (<TIMES> P() | <DIVIDE> P())*
 }
 
-void E2() : {}
+void F() : {}
 {
     <LRP> E() <RRP> | <ID> | <RNUM>
 }
 
-void E3() : {}
+void P() : {}
 {
-    (<TIMES> E2() E3() | <DIVIDE> E2() E3() | <POWER> E2() E3())?
+   F() (<POWER> P())?
 }
 */
 
-// Ağaç oluşturma, işlem önceliği yok
-
-/*
-Exp parse() : {Exp e;}
+// AST
+Exp parse(): {Exp e;}
 {
-    e = E() <EOF> {return e;}
+   e = E() <EOF> {return e;} 
+} 
+
+
+Exp E(): {Exp e1,e2;}
+{  
+    e1=P()
+
+    (
+     <TIMES> e2= P() { e1=new Times(e1,e2);}
+    |<DIVIDE> e2= P() { e1=new Divide(e1,e2);}
+    )*
+
+    {return e1;}
 }
 
-Exp E() : {Exp e1;}
-{
-    e1 = E2() e1 = E3(e1) {return e1;}
+Exp P(): {Exp e1,e2;}
+{  
+    e1=F()
+    [
+     <POWER> e2 =P() { e1 = new Power(e1,e2);}
+    ]
+
+    {return e1;}
 }
 
-Exp E2() : {Exp e1; Token t;}
+Exp F(): {Exp e1; Token t;}
 {
-    <LRP> e1 = E() <RRP> {return e1;} 
-    | t = <ID> {return new X(t.image);}
-    | t = <RNUM> {return new RNum(t.image);}
-}
-
-Exp E3(Exp e1) : {Exp e2;}
-{
-    (<POWER> e2 = E2()  e2 = E3(e2) {e1 = new  Power(e1,e2);}
-    |<TIMES> e2 = E2()  e2 = E3(e2) {e1 = new  Times(e1,e2);}
-    |<DIVIDE> e2 = E2()  e2 = E3(e2) {e1 = new  Divide(e1,e2);})? {return e1;}
-}
-*/
-
-// Ağaç oluşumu, işlem Önceliği
-
-Exp parse() : {Exp e;}
-{
-    e = E() <EOF> {return e;}
-}
-
-Exp E() : {Exp e1;}
-{
-    e1 = P() e1 = E3(e1) {return e1;}
-}
-
-Exp E2() : {Exp e1; Token t;}
-{
-    <LRP> e1 = E() <RRP> {return e1;} 
-    | t = <ID> {return new X(t.image);}
-    | t = <RNUM> {return new RNum(t.image);}
-}
-
-Exp P(): {Exp e1, e2;}
-{
-    e1 = E2() (<POWER> e2 = P() {e1 = new Power(e1, e2);})? {return e1;}
-}
-
-Exp E3(Exp e1) : {Exp e2;}
-{
-    (<TIMES> e2 = P()  e2 = E3(e2) {e1 = new  Times(e1,e2);}
-    |<DIVIDE> e2 = P()  e2 = E3(e2) {e1 = new  Divide(e1,e2);}
-    | <LRP> e1 = E() <RRP>)? {return e1;}
+    <LRP> e1 = E() <RRP> {return e1;}
+    |t = <ID> {return new X(t.image);}
+    |t = <RNUM>{return new RNum(t.image);}
 }

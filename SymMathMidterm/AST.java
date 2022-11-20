@@ -10,7 +10,7 @@ class RNum extends Exp{
 			numerator = Integer.parseInt(String.valueOf(number.charAt(0)));
 			denominator = Integer.parseInt(String.valueOf(number.charAt(2)));
 		}
-		else if (number.length() == 1){
+		else if(number.length() == 1) {
 			numerator = Integer.parseInt(String.valueOf(number.charAt(0)));
 			denominator = 1;
 		}

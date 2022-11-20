@@ -3,7 +3,7 @@ import pathlib
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-input_file = "Input1.txt"
+input_file = "Input5.txt"
 
 if os.path.isdir(os.path.join(dir_path, "out")):
 	os.system("javacc Midterm.jj && javac -d " + os.path.join(dir_path, "out") + " *.java && java -cp " + os.path.join(dir_path, "out ") + "MidtermParser < " + input_file)

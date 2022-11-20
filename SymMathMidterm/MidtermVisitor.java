@@ -8,65 +8,136 @@ class MidtermVisitor implements Visitor{
 	}
 
 	public Object visit(X e){
-		return e.id;
+		return e;
 	}
 
 	public Object visit(Times e){
 		Object x = e.e1.accept(this);
-		Object y = e.e2.accept(this);
-		int n1 = ((RNum)x).numerator;
-		int d1 = ((RNum)x).denominator;
-		int n2 = ((RNum)y).numerator;
-		int d2 = ((RNum)y).denominator;
-
-		if (d1 == 1){
-			int n3 = d2 * 1 + n2;
-			int d3 = d2;
-			return new RNum(n3 + "/" + d3);
-		}
-		if (d2 == 1){
-			int n3 = d1 * 1 + n1;
-			int d3 = d1;
-			return new RNum(n3 + "/" + d3);
+		int xNumerator;
+		int xDenominator;
+		if (x instanceof X){
+			xNumerator = 1;
+			xDenominator = 1;
+			System.out.println("Inside Times, x instanceof X, " + xNumerator + "/" + xDenominator);
 		}
 		else{
-			int n3 = n1 * d2 + d1 * n2;
-			int d3 = d1 * d2;
-			return new RNum(n3 + "/" + d3);
+			xNumerator = ((RNum)x).numerator;
+			xDenominator = ((RNum)x).denominator;
+			System.out.println("Inside Times, x !instanceof X, " + xNumerator + "/" + xDenominator);
 		}
+
+		Object y = e.e2.accept(this);
+		int yNumerator;
+		int yDenominator;
+		if (y instanceof X){
+			yNumerator = 1;
+			yDenominator = 1;
+			System.out.println("Inside Times, y instanceof X, " + yNumerator + "/" + yDenominator);
+		}
+		else{
+			yNumerator = ((RNum)y).numerator;
+			yDenominator = ((RNum)y).denominator;
+			System.out.println("Inside Times, y !instanceof X, " + yNumerator + "/" + yDenominator);
+		}
+
+		int rNumerator = xNumerator * yDenominator + xDenominator * yNumerator;
+		int rDenominator = xDenominator * yDenominator;
+
+		
+		if(x instanceof X || y instanceof X){
+			RNum rNum = new RNum("");
+			rNum.numerator = rNumerator;
+			rNum.denominator = rDenominator;
+			System.out.println("Inside Times, x or y instanceof X, " + rNum.numerator + "/" + rNum.denominator);
+			return rNum;
+		}
+		else{
+			((RNum)y).numerator = rNumerator;
+			((RNum)y).denominator = rDenominator;
+			System.out.println("Inside Times, none of them instanceof X, " + ((RNum)y).numerator + "/" + ((RNum)y).denominator);
+			return y;
+		}
+		
 	}
 
 	public Object visit(Divide e){
 		Object x = e.e1.accept(this);
-		Object y = e.e2.accept(this);
-		int n1 = ((RNum)x).numerator;
-		int d1 = ((RNum)x).denominator;
-		int n2 = ((RNum)y).numerator;
-		int d2 = ((RNum)y).denominator;
-
-		if (d1 == 1){
-			int n3 = d2 * 1 - n2;
-			int d3 = d2;
-			return new RNum(n3 + "/" + d3);
-		}
-		if (d2 == 1){
-			int n3 = d1 * 1 - n1;
-			int d3 = d1;
-			return new RNum(n3 + "/" + d3);
+		int xNumerator;
+		int xDenominator;
+		if (x instanceof X){
+			xNumerator = 1;
+			xDenominator = 1;
+			System.out.println("Inside Divide, x instanceof X, " + xNumerator + "/" + xDenominator);
 		}
 		else{
-			int n3 = n1 * d2 - d1 * n2;
-			int d3 = d1 * d2;
-			return new RNum(n3 + "/" + d3);
+			xNumerator = ((RNum)x).numerator;
+			xDenominator = ((RNum)x).denominator;
+			System.out.println("Inside Divide, x !instanceof X, " + xNumerator + "/" + xDenominator);
+		}
+
+		Object y = e.e2.accept(this);
+		int yNumerator;
+		int yDenominator;
+		if (y instanceof X){
+			yNumerator = 1;
+			yDenominator = 1;
+			System.out.println("Inside Divide, y instanceof X, " + yNumerator + "/" + yDenominator);
+		}
+		else{
+			yNumerator = ((RNum)y).numerator;
+			yDenominator = ((RNum)y).denominator;
+			System.out.println("Inside Divide, y !instanceof X, " + yNumerator + "/" + yDenominator);
+		}
+
+		int rNumerator = xNumerator * yDenominator - xDenominator * yNumerator;
+		int rDenominator = xDenominator * yDenominator;
+
+		
+		if(x instanceof X || y instanceof X){
+			RNum rNum = new RNum("");
+			rNum.numerator = rNumerator;
+			rNum.denominator = rDenominator;
+			System.out.println("Inside Divide, x or y instanceof X, " + rNum.numerator + "/" + rNum.denominator);
+			return rNum;
+		}
+		else{
+			((RNum)y).numerator = rNumerator;
+			((RNum)y).denominator = rDenominator;
+			System.out.println("Inside Divide, none of them instanceof X, " + ((RNum)y).numerator + "/" + ((RNum)y).denominator);
+			return y;
 		}
 	}
 
 
 	public Object visit(Power e){
-		Object y = e.e2.accept(this);
-		int n1 = ((RNum)y).numerator;
-		int d1 = ((RNum)y).denominator;
-		return new Power(e.e1, new RNum(n1 + "/" + d1));
+		if(e.e1.accept(this) instanceof X){
+			System.out.println("Inside Power, e1 instanceof X, returned e2");
+			return e.e2.accept(this);
+		}
+		else{
+			System.out.println("Inside Power, e1 !instanceof X");
+			Object x = e.e1.accept(this);
+			int xNumerator = ((RNum)x).numerator;
+			int xDenominator = ((RNum)x).denominator;
+
+			System.out.println("Inside Power, e1 = " + xNumerator + "/" + xDenominator);
+
+			Object y = e.e2.accept(this);
+			int yNumerator = ((RNum)y).numerator;
+			int yDenominator = ((RNum)y).denominator;
+
+			System.out.println("Inside Power, e2 = " + " = " + yNumerator + "/" + yDenominator);
+
+			int rNumerator = xNumerator * yNumerator;
+			int rDenominator = xDenominator * yDenominator;
+
+			System.out.println("Inside Power, Powered : " + rNumerator + "/" + rDenominator);
+
+			((RNum)y).numerator = rNumerator;
+			((RNum)y).denominator = rDenominator;
+
+			return y;
+		}
 	}
 	
 }
