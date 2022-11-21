@@ -13,7 +13,7 @@ public class MidtermParser {
     Exp e = new MidtermParser(System.in).parse();
     System.out.println(e + "");
     MidtermVisitor v = new MidtermVisitor();
-    System.out.println(v.visit(e) + "");
+    System.out.println("x^" + v.visit(e));
   }
 }
 PARSER_END(MidtermParser)

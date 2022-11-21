@@ -2,14 +2,16 @@
 
 ## Dependencies ###
 
+For development i used:
 Javacc 7+
 JDK 19+
+
+other versions may or may not work.
+
 Python 3+ (for compiling + running)
 
 ## Running ###
 ```console
-python run.py
+python run.py <input file name.txt>
 ``` 
-
-If you want to change the input txt, change input_file variable in run.py file.
 

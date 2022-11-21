@@ -21,10 +21,10 @@ class RNum extends Exp{
 	}
 	public String toString(){
 		if(denominator == 1){
-			return "RNum(" + numerator + ")";
+			return "(" + numerator + ")";
 		}
 		else{
-			return "RNum("+ numerator + "/" + denominator +")";
+			return "("+ numerator + "/" + denominator +")";
 		}
 	}
 	public Object accept(Visitor v){
